@@ -300,7 +300,7 @@ function App() {
 
   const importFromJSON: React.ChangeEventHandler<HTMLInputElement> | undefined = (e) => {
     if (!e.target.files) {
-      alert('SOmething went wrong while uploading file')
+      alert('Something went wrong while uploading file')
       return
     }
     const jsonSheet = e.target.files[0]
@@ -309,7 +309,7 @@ function App() {
 
     fileReader.onload = (e) => {
       const text = e.target?.result as string;
-      const grid = JSON.parse(text)
+      const grid: Cell[][] | undefined = JSON.parse(text)
 
       if (!Array.isArray(grid)) {
         alert('Invalid format');

@@ -1,46 +1,96 @@
-# Getting Started with Create React App
+# React Spreadsheet Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A feature-rich spreadsheet application built with React and TypeScript that allows you to create, edit, and manage spreadsheets with various formatting options and formula calculations.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- 10x10 default grid layout
+- Add more rows and columns as needed
+- Apply formatting (bold text and background colors) to cells
+- Use SUM and AVG functions on selected cells
+- Copy and paste cell content
+- Export spreadsheet to JSON format
+- Import spreadsheet from JSON format
 
-### `npm start`
+## Prerequisites
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Node.js (v16 or later)
+- npm or yarn
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Installation
 
-### `npm test`
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd react-assignment
+   ```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-### `npm run build`
+## Running the Application
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+To start the development server:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm start
+# or
+yarn start
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+This will launch the application in development mode at [http://localhost:3000](http://localhost:3000).
 
-### `npm run eject`
+## Building for Production
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+To create an optimized production build:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm run build
+# or
+yarn build
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+The built files will be in the `build` directory.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Usage Guide
 
-## Learn More
+### Basic Navigation
+- Click on a cell to select it
+- Use mouse to navigate between cells
+- Use Shift + mouse click to select multiple cells
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Formatting Cells
+- Select a cell or multiple cells
+- Use the toolbar to:
+  - Toggle bold text formatting
+  - Change background color
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Using Formulas
+1. Select a cell where you want to display the result
+2. Click on the SUM or AVG button in the toolbar
+3. Select the range of cells you want to include in the calculation
+4. The result will be displayed in the initially selected cell
+
+### Adding Rows and Columns
+- Click the "Add Row" button to add a new row at the bottom
+- Click the "Add Column" button to add a new column on the right
+
+### Export/Import
+- Click "Export" to save your spreadsheet as a JSON file
+- Click "Import" and select a previously exported JSON file to load a spreadsheet
+
+## Technologies Used
+
+- React 19
+- TypeScript
+- TailwindCSS
+- UUID
+- React Colorful (for color picker)
+
+## License
+
+[MIT](LICENSE)

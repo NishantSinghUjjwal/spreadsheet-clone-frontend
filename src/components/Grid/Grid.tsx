@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Cell } from '../../App';
 import { v4 as uuid } from 'uuid'
@@ -26,7 +26,6 @@ const Grid = (
     }
 ) => {
 
-
     return (
     <div
     style={{
@@ -39,6 +38,7 @@ const Grid = (
     {grid.map((row, rIndex) =>
       row.map((cell, cIndex) => {
         const data = formulaCell.cell && formulaCell.cell.id == cell.id ? { ...formulaCell.cell } : { ...cell }
+
         return (
           <div
             onClick={(e) => selectCell(cell, rIndex, cIndex, e.shiftKey, e.ctrlKey)}

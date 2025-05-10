@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { HexColorPicker } from 'react-colorful'
 import { twMerge } from 'tailwind-merge'
 import { Cell } from '../App'
+import ColorPicker from './ui/ColorPicker'
 
 const Toolbar = ({
     changeFontWeight,
@@ -35,12 +36,13 @@ const Toolbar = ({
             <div className="relative">
                 <button className="p-1 px-2 bg-white border border-gray-300 rounded hover:bg-gray-200 flex items-center" onClick={() => setShowFillColorPicker(prev => !prev)}>
                     <span className="mr-1">A</span>
-                    <div className="w-3 h-3 border border-gray-400 bg-red-500"></div>
+                    <div className="w-3 h-3 border border-gray-400 bg-white"></div>
                 </button>
                 {showFillColorPicker && (
-                    <div className="absolute z-10 mt-1 shadow-xl">
-                        <HexColorPicker color={'black'} onChange={changeCellBackground} />
-                    </div>
+                   <ColorPicker 
+                   changeCellBackground={changeCellBackground}
+                   onClose={() => setShowFillColorPicker(false)}
+                   />
                 )}
             </div>
         </div>
