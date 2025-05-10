@@ -45,7 +45,7 @@ const Grid = (
             id={`cell_${cell.id}`}
             key={cIndex}
             className={twMerge(
-              "border border-gray-300 w-full min-w-10 h-6 flex items-center hover:border-gray-500 cursor-default",
+              "border border-gray-300 w-full min-w-32 h-6 flex items-center hover:border-gray-500 cursor-default",
               selectedCells.includes(`${rIndex}-${cIndex}` || '') && "border-2 border-blue-600 bg-[#E8F3FD]",
               formulaCell.cell && selectedCells.includes(`${rIndex}-${cIndex}` || '') && "border-2 border-dashed border-green-500"
             )}

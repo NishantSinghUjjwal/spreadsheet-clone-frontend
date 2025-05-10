@@ -2,17 +2,17 @@ import React from 'react'
 
 const AddCellsLayout = ({ children, addRow, addCol }: { children: React.ReactNode, addRow: () => void, addCol: () => void }) => {
     return (
-        <div className="flex w-full h-full">
-            <div className="flex flex-col w-full">
+        <div className="flex h-[calc(100%_-_7.50rem)] relative">
+            <div className="flex flex-col w-[calc(100%_-_1.5rem)] h-full">
                 {children}
                 <button
-                    className="text-xs bg-gray-200 h-6 w-full flex items-center justify-center hover:bg-gray-300 border border-gray-400"
+                 className=" w-full h-6 text-xs bg-gray-200 hover:bg-gray-300 border-l border-gray-400 mt-auto"
                     onClick={addRow}>
                     +
                 </button>
             </div>
             <button
-                className="text-xs bg-gray-200 h-full w-6 flex items-center justify-center hover:bg-gray-300 border border-gray-400"
+               className=" w-6 min-w-6 h-full text-xs bg-gray-200 hover:bg-gray-300 border-t border-gray-400"
                 onClick={addCol}>
                 +
             </button>
