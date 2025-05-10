@@ -1,3 +1,5 @@
+import { FormulaType } from "../types/types";
+
 export const getCellPosition = (cellId: string) => {
     return cellId.split('-').map(Number)
 }
@@ -26,13 +28,14 @@ export const getSelectedCellsFromRange = (selectedRange: { start: [number, numbe
     return selectedIDs
   }
 
-  export const calculateFormula = (type: string | null, values: number[]) => {
+  export const calculateFormula = (type: FormulaType | null, values: number[]) => {
     if (type == 'SUM') {
       return calculateSum(values)
     }
     else if (type == 'AVG') {
       return calculateAvg(values)
     }
+    else throw new Error('Invalid formula type')
   }
 
   export const calculateSum = (values: number[]) => {
@@ -40,7 +43,8 @@ export const getSelectedCellsFromRange = (selectedRange: { start: [number, numbe
       return acc + Number(cell)
     }, 0)
 
-    return isNaN(total) ? 'ERROR' : total.toString()
+    if(isNaN(total)) throw new Error('Value is not a number')
+    return total
   }
 
   export const calculateAvg = (values: number[]) => {
@@ -48,7 +52,8 @@ export const getSelectedCellsFromRange = (selectedRange: { start: [number, numbe
       return acc + Number(cell)
     }, 0)
     const avg = total / values.length
-    return isNaN(avg) ? 'ERROR' : avg.toString()
+    if(isNaN(avg)) throw new Error('Value is not a number')
+    return avg
   }
 
   

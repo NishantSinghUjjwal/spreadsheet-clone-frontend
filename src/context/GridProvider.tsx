@@ -26,38 +26,11 @@ interface GridContextType {
     handleCopy: (e: ClipboardEvent) => void,
     handlePaste: (e: ClipboardEvent) => void,
     handleKeyDown: (e: KeyboardEvent) => void,
-    calculateFormula: (type: string | null, values: number[]) => string,
+    calculateFormula: (type: FormulaType | null, values: number[]) => number,
     selectCell: (row: number, col: number, shiftPressed: boolean) => void,
     onChangeCellValue: (id: string, value: string) => void,
 }
-export const GridContext = createContext<GridContextType>({
-    rows: 0,
-    cols: 0,
-    grid: [],
-    selectedCells: [],
-    formulaCell: null,
-    selectedRange: null,
-    selectCell: () => {},
-    setSelectedCells: () => {},
-    setFormulaCell: () => {},
-    setSelectedRange: () => {},
-    setGrid: () => {},
-    setRows: () => {},
-    setCols: () => {},
-    addRow: () => {},
-    addCol: () => {},
-    changeCellBackground: () => {},
-    changeFontWeight: () => {},
-    onClickSum: () => {},
-    onClickAvg: () => {},
-    exportToJSON: () => {},
-    importFromJSON: (e: React.ChangeEvent<HTMLInputElement>) => {},
-    handleCopy: () => {},
-    handleKeyDown: () => {},
-    handlePaste: () => {},
-    calculateFormula: () => '',
-    onChangeCellValue: () => {},
-})
+export const GridContext = createContext<GridContextType>({} as GridContextType)
 const GridProvider = ({children}: {children: React.ReactNode}) => {
 
     //default grid rows and cols
@@ -120,6 +93,7 @@ const GridProvider = ({children}: {children: React.ReactNode}) => {
     let usedFormulaCell: Cell | null = null;
     let dependencies: string[] = [];
 
+    //find the formula cell that depends on the cell that changed
     formulaDependencies.forEach((deps, targetCell: string) => {
       if (deps.includes(cellId)) {
         const [row, col] = getCellPosition(targetCell);
@@ -135,7 +109,7 @@ const GridProvider = ({children}: {children: React.ReactNode}) => {
 
     //@ts-ignore
     if (!usedFormulaCell || !usedFormulaCell.formula) return;
-    // Add type assertion to help TypeScript understand the type
+
     const cell = usedFormulaCell as Cell;
     const formulaType = cell.formula;
     if (!formulaType) return
@@ -147,9 +121,8 @@ const GridProvider = ({children}: {children: React.ReactNode}) => {
 
     const total = calculateFormula(formulaType, values)
 
-    if (isNaN(Number(total)) || total == undefined) return
     setGrid(prev => prev.map(row => row.map(cell => {
-      if (cell.id == usedFormulaCell?.id) return { ...cell, value: total }
+      if (cell.id == usedFormulaCell?.id) return { ...cell, value: total.toString() }
       return cell
     })))
   }
@@ -161,6 +134,8 @@ const GridProvider = ({children}: {children: React.ReactNode}) => {
       if (`${i}-${j}` == id) return { ...c, value }
       else return c
     })))
+
+    //if value changes re calculate the formula depending on this value
     updateFormulaOnValueChange(id, value)
   };
 
@@ -415,9 +390,10 @@ const GridProvider = ({children}: {children: React.ReactNode}) => {
       const total = calculateFormula(formulaCell.type || null, values)
       if (isNaN(Number(total)) || total == undefined) return;
       if(formulaCell.type == null) return;
+
       setGrid(prev => prev.map(row => row.map(cell => {
         if (cell.id == formulaCell.cell?.id) {
-          return { ...cell, value: total, formula: formulaCell.type }
+          return { ...cell, value: total.toString(), formula: formulaCell.type }
         }
         return cell
       })))
@@ -526,7 +502,7 @@ const GridProvider = ({children}: {children: React.ReactNode}) => {
         handleCopy,
         handlePaste,
         handleKeyDown,
-        calculateFormula: (type: string | null, values: number[]) => calculateFormula(type, values) || '',
+        calculateFormula,
         onChangeCellValue,
     }}>
       {children}
