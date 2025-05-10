@@ -6,8 +6,6 @@ const Footer = ({ selectedCells }: { selectedCells: string[] }) => {
     <div className="px-2">
       {selectedCells.length > 0 ? `${selectedCells.length} cell${selectedCells.length > 1 ? 's' : ''} selected` : 'Ready'}
     </div>
-    <div className="flex-1"></div>
-    <div className="px-2">100%</div>
   </div>
   )
 }
