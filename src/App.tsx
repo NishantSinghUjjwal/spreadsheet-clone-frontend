@@ -4,6 +4,7 @@ import AddCellsLayout from "./components/Grid/SubComponents/AddCellsLayout";
 import Footer from "./components/Footer";
 import GridHeaderLayout from "./components/GridHeaderLayout";
 import Grid from "./components/Grid/Grid";
+import {useEffect} from 'react'
 //10 x 10 default grid (DONE)
 //can add more rows and columns (DONE)
 //can perform SUM and AVG functions on selected cells (DONE)
@@ -14,6 +15,9 @@ import Grid from "./components/Grid/Grid";
 
 const App = () => {
 
+    useEffect(()=>{
+      document.title = 'Excel'
+    },[])
 
   return (
     <div className="flex flex-col h-screen bg-white w-full">
