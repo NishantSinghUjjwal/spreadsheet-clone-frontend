@@ -60,7 +60,6 @@ The built files will be in the `build` directory.
 
 ### Basic Navigation
 - Click on a cell to select it
-- Use mouse to navigate between cells
 - Use Shift + mouse click to select multiple cells
 
 ### Formatting Cells
@@ -90,6 +89,7 @@ The built files will be in the `build` directory.
 - TailwindCSS
 - UUID
 - React Colorful (for color picker)
+- Lucide React (for icons)
 
 ## License
 
