@@ -6,10 +6,8 @@ const ColorPicker = ({changeCellBackground, onClose}: {changeCellBackground: (co
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-        console.log(popupRef.current,popupRef.current?.contains(event.target as Node))
-        console.log(event.target)
       if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
-        onClose(); // close popup
+        onClose();
       }
     };
 

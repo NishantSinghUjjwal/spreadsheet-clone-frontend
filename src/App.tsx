@@ -1,9 +1,4 @@
-import React, { KeyboardEventHandler, useEffect, useState } from "react";
-import logo from "./logo.svg";
 import "./App.css";
-import { v4 as uuid } from 'uuid'
-import { twMerge } from "tailwind-merge";
-import { HexColorPicker } from "react-colorful";
 import Toolbar from "./components/Toolbar";
 import AddCellsLayout from "./components/Grid/SubComponents/AddCellsLayout";
 import Footer from "./components/Footer";
@@ -13,7 +8,7 @@ import Grid from "./components/Grid/Grid";
 //can add more rows and columns (DONE)
 //can perform SUM and AVG functions on selected cells (DONE)
 //can format selected cells with bold text and background color (DONE)
-//can copy paste cells (DONE) Multiple is remaining
+//can copy paste cells (DONE)
 //can save the  spreadsheet to JSON format (DONE)
 //can load the spreadsheet from JSON format (DONE)
 

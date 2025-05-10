@@ -1,7 +1,7 @@
 import { FormulaType } from "../types/types";
 
-export const getCellPosition = (cellId: string) => {
-    return cellId.split('-').map(Number)
+export const getCellPosition = (cellId: string): [number, number] => {
+    return cellId.split('-').map(Number) as [number, number]
 }
 
 export const getSelectedCellsFromRange = (selectedRange: { start: [number, number], end: [number, number] } | null) => {
