@@ -31,7 +31,7 @@ function App() {
     id: null,
     value: "",
     row: undefined,
-    col:undefined,
+    col: undefined,
     styles: { fontWeight: "normal", backgroundColor: "transparent" },
     formula: null
   };
@@ -45,11 +45,11 @@ function App() {
 
   const [showFillColorPicker, setShowFillColorPicker] = useState(false)
 
-  const [formulaDependencies, setFormulaDependencies] = useState<Map<string,string[]>>(new Map())
+  const [formulaDependencies, setFormulaDependencies] = useState<Map<string, string[]>>(new Map())
 
   const [formulaCell, setFormulaCell] = useState<{ type: 'SUM' | 'AVG' | null, cell: Cell | null }>({ type: null, cell: null })
 
-  const [selectedRange, setSelectedRange] = useState<{ start: [number,number], end: [number,number] } | null>(null)
+  const [selectedRange, setSelectedRange] = useState<{ start: [number, number], end: [number, number] } | null>(null)
 
   //i used fill before, but it was causing issues, thats why has to use .from()
   const [grid, setGrid] = useState<Cell[][]>(
@@ -61,11 +61,11 @@ function App() {
     )
   );
 
-  function updateFormula(cellId: string,newCellValue:string) {
+  function updateFormula(cellId: string, newCellValue: string) {
     console.log('cellId', cellId)
     let usedFormulaCell: Cell | null = null;
     let dependencies: string[] = [];
-    
+
     formulaDependencies.forEach((deps, targetCell: string) => {
       if (deps.includes(cellId)) {
         const [row, col] = targetCell.split('-').map(Number);
@@ -80,27 +80,27 @@ function App() {
     });
 
     console.log('usedFormulaCell', usedFormulaCell)
-//@ts-ignore
+    //@ts-ignore
     if (!usedFormulaCell || !usedFormulaCell.formula) return;
     // Add type assertion to help TypeScript understand the type
     const cell = usedFormulaCell as Cell;
     const formulaType = cell.formula;
-    if(!formulaType) return
+    if (!formulaType) return
     const values = dependencies.map(cell => {
       const [row, col] = cell.split('-').map(Number)
-      if(`${row}-${col}` == cellId) return Number(newCellValue)
+      if (`${row}-${col}` == cellId) return Number(newCellValue)
       return Number(grid[row][col].value)
     })
-    
-    const total = calculateFormula(formulaType,values)
-    
-    if(isNaN(Number(total)) || total == undefined) return
+
+    const total = calculateFormula(formulaType, values)
+
+    if (isNaN(Number(total)) || total == undefined) return
     setGrid(prev => prev.map(row => row.map(cell => {
-      if(cell.id == usedFormulaCell?.id) return { ...cell, value: total }
+      if (cell.id == usedFormulaCell?.id) return { ...cell, value: total }
       return cell
     })))
   }
-  
+
 
   //i need to implement debouncing here later :TODO
   const onChangeCell = (id: string, value: string) => {
@@ -108,7 +108,7 @@ function App() {
       if (`${i}-${j}` == id) return { ...c, value }
       else return c
     })))
-    updateFormula(id,value)
+    updateFormula(id, value)
   };
 
   const addCol = () => {
@@ -167,11 +167,11 @@ function App() {
   }
   const handleCopy = (e: ClipboardEvent) => {
     if (!selectedCells.length) return;
-  
+
     e.preventDefault(); // Prevent default copy behavior
-  
+
     const idMap = createIdPositionMap(grid); // Maps cell.id => [row, col]
-  
+
     const copiedData: {
       rowOffset: number;
       colOffset: number;
@@ -181,16 +181,16 @@ function App() {
         backgroundColor: string;
       };
     }[] = [];
-  
+
     const anchorId = selectedCells[0];
     const [anchorRow, anchorCol] = idMap.get(anchorId) ?? [];
-  
+
     if (anchorRow === undefined || anchorCol === undefined) return;
-  
+
     for (const id of selectedCells) {
       const [row, col] = idMap.get(id) ?? [];
       if (row === undefined || col === undefined) continue;
-  
+
       const cell = grid[row][col];
       copiedData.push({
         rowOffset: row - anchorRow,
@@ -202,47 +202,47 @@ function App() {
         },
       });
     }
-  
+
     e.clipboardData?.setData('application/json', JSON.stringify(copiedData));
   };
-  
-  
+
+
   const handlePaste = (e: ClipboardEvent) => {
     if (!selectedCells.length) return;
-  
+
     const data = e.clipboardData?.getData('application/json');
     if (!data) return;
-  
+
     e.preventDefault();
-  
+
     let copiedCells: {
       rowOffset: number;
       colOffset: number;
       value: string;
       styles: { fontWeight: string; backgroundColor: string };
     }[];
-  
+
     try {
       copiedCells = JSON.parse(data);
     } catch (err) {
       console.error('Invalid clipboard data format');
       return;
     }
-  
+
     if (!copiedCells?.length) return;
-  
+
     const idMap = createIdPositionMap(grid);
     const newGrid = [...grid.map(row => [...row])];
-  
+
     if (copiedCells.length === 1) {
       // Paste one value into all selected cells
       const copied = copiedCells[0];
-  
+
       for (const id of selectedCells) {
         const [row, col] = idMap.get(id) ?? [];
-  
+
         if (row === undefined || col === undefined) continue;
-  
+
         const targetCell = { ...newGrid[row][col] };
         targetCell.value = copied.value;
         targetCell.styles = { ...copied.styles };
@@ -251,11 +251,11 @@ function App() {
     } else {
       // Multi-cell paste using relative position from anchor
       const [startRow, startCol] = idMap.get(selectedCells[0]) ?? [0, 0];
-  
+
       for (const cellData of copiedCells) {
         const targetRow = startRow + cellData.rowOffset;
         const targetCol = startCol + cellData.colOffset;
-  
+
         if (
           targetRow >= newGrid.length ||
           targetCol >= newGrid[0].length ||
@@ -264,18 +264,18 @@ function App() {
         ) {
           continue;
         }
-  
+
         const targetCell = { ...newGrid[targetRow][targetCol] };
         targetCell.value = cellData.value;
         targetCell.styles = { ...cellData.styles };
         newGrid[targetRow][targetCol] = targetCell;
       }
     }
-  
+
     setGrid(newGrid);
   };
-  
-  
+
+
 
 
   const exportToJSON = () => { //
@@ -351,7 +351,7 @@ function App() {
     })
     const [row, col] = selectedCells[0].split('-').map(Number)
     const actualCell = grid[row][col]
-    setFormulaCell({ type: 'SUM', cell: { id: actualCell.id,row:row,col:col, styles: { fontWeight: 'normal', backgroundColor: 'lightgray' }, value: '=SUM()', formula: 'SUM' } })
+    setFormulaCell({ type: 'SUM', cell: { id: actualCell.id, row: row, col: col, styles: { fontWeight: 'normal', backgroundColor: 'lightgray' }, value: '=SUM()', formula: 'SUM' } })
   }
 
   const onClickAvg = () => {
@@ -369,7 +369,7 @@ function App() {
     setFormulaCell({ type: 'AVG', cell: { id: selectedCells[0], styles: { fontWeight: 'normal', backgroundColor: 'lightgray' }, value: '=AVG()', formula: 'AVG' } })
   }
 
-  const calculateFormula = (type: string | null,values:number[]) => {
+  const calculateFormula = (type: string | null, values: number[]) => {
     if (type == 'SUM') {
       return calculateSum(values)
     }
@@ -378,33 +378,33 @@ function App() {
     }
   }
 
-  const calculateSum = (values:number[]) => {
+  const calculateSum = (values: number[]) => {
     let total = values.reduce((acc, cell) => {
-        return acc + Number(cell)
+      return acc + Number(cell)
     }, 0)
 
     return total.toString()
   }
 
-  const calculateAvg = (values:number[]) => {
+  const calculateAvg = (values: number[]) => {
     let total = values.reduce((acc, cell) => {
-        return acc + Number(cell)
+      return acc + Number(cell)
     }, 0)
-      const avg = total / values.length
+    const avg = total / values.length
     return avg.toString()
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key == 'Enter') {
-      if(!formulaCell.cell) return
+      if (!formulaCell.cell) return
       const selectedCells = getSelectedCellsFromRange()
-      if(!selectedCells) return
+      if (!selectedCells) return
 
       const values = selectedCells.map(cell => {
         const [row, col] = cell.split('-').map(Number)
         return Number(grid[row][col].value)
       })
-      const total = calculateFormula(formulaCell.type || null,values)
+      const total = calculateFormula(formulaCell.type || null, values)
       if (isNaN(Number(total)) || total == undefined) return;
 
       setGrid(prev => prev.map(row => row.map(cell => {
@@ -426,7 +426,7 @@ function App() {
     }
   }
 
-  const selectCell = (cell: Cell,row:number,col:number, shiftPressed: boolean,ctrlPressed:boolean) => {
+  const selectCell = (cell: Cell, row: number, col: number, shiftPressed: boolean, ctrlPressed: boolean) => {
 
     // if (selectedCells.length > 1 && ctrlPressed && selectedCells.includes(`${row}-${col}` || '')) {
     //   //if cell is secondary cell and cell is already selected, then remove it from selected cells
@@ -435,25 +435,25 @@ function App() {
     // else if(ctrlPressed){
     //   setSelectedCells(prev => [...prev, `${row}-${col}` || ''])
     // }
-     if (shiftPressed) {
+    if (shiftPressed) {
       //if shift is preseed we need to save range of ids inside array
-      
-     setSelectedRange(prev=>{
-      if(prev == null){
-        let start = null
-        grid.forEach((r,rIndex)=>{
-          r.forEach((c,cIndex)=>{
-            if(`${rIndex}-${cIndex}` == selectedCells[0]){
-              start = [rIndex,cIndex]
-            }
+
+      setSelectedRange(prev => {
+        if (prev == null) {
+          let start = null
+          grid.forEach((r, rIndex) => {
+            r.forEach((c, cIndex) => {
+              if (`${rIndex}-${cIndex}` == selectedCells[0]) {
+                start = [rIndex, cIndex]
+              }
+            })
           })
-        })
-        return {start:start||[row,col],end:[row,col]} 
-      }
-      else{
-        return {start:prev.start,end:[row,col]}
-      }
-     })
+          return { start: start || [row, col], end: [row, col] }
+        }
+        else {
+          return { start: prev.start, end: [row, col] }
+        }
+      })
 
     }
     else {
@@ -464,34 +464,34 @@ function App() {
   useEffect(() => {
     const handlePasteWrapper = (e: ClipboardEvent) => handlePaste(e);
     const handleCopyWrapper = (e: ClipboardEvent) => handleCopy(e);
-  
+
     document.addEventListener('paste', handlePasteWrapper);
     document.addEventListener('copy', handleCopyWrapper);
     document.addEventListener('keydown', handleKeyDown)
-  
+
     return () => {
       document.removeEventListener('paste', handlePasteWrapper);
       document.removeEventListener('copy', handleCopyWrapper);
       document.removeEventListener('keydown', handleKeyDown)
     };
   }, [grid, selectedCells]); // Include dependencies that `handlePaste` and `handleCopy` rely on
-  
 
-  const getSelectedCellsFromRange = ()=>{
-  
+
+  const getSelectedCellsFromRange = () => {
+
     if (!selectedRange?.start && !selectedRange?.end) return;
 
 
     const [startRow, startCol] = selectedRange.start || selectedRange.end;
     const [endRow, endCol] = selectedRange.end || selectedRange.start;
-  
+
     const top = Math.min(startRow, endRow);
     const bottom = Math.max(startRow, endRow);
     const left = Math.min(startCol, endCol);
     const right = Math.max(startCol, endCol);
-  
+
     const selectedIDs: string[] = [];
-  
+
     for (let r = top; r <= bottom; r++) {
       for (let c = left; c <= right; c++) {
         selectedIDs.push(`${r}-${c}`);
@@ -500,14 +500,14 @@ function App() {
 
     return selectedIDs
   }
-  useEffect(()=>{
-    if(!selectedRange?.start || !selectedRange?.end) return
+  useEffect(() => {
+    if (!selectedRange?.start || !selectedRange?.end) return
     const selectedCells = getSelectedCellsFromRange()
-    if(!selectedCells) return
+    if (!selectedCells) return
     setSelectedCells([...selectedCells])
-    
-  },[selectedRange?.start,selectedRange?.end])
-    
+
+  }, [selectedRange?.start, selectedRange?.end])
+
 
   return (
     <div className="flex flex-col items-start justify-start h-screen transition-all">
@@ -538,32 +538,52 @@ function App() {
           onClick={addRow}>
           +
         </button>
-        <div
-          className="border-2 border-gray-300 grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: `repeat(${cols},1fr)`,
-            gridTemplateRows: `repeat(${rows},1fr)`,
-          }}>
-          {grid.map((row, rIndex) =>
-            row.map((cell, cIndex) => {
-              const data = formulaCell.cell && formulaCell.cell.id == cell.id ? { ...formulaCell.cell } : { ...cell }
-              return (
-                <div
-                  onClick={(e) => selectCell(cell, rIndex, cIndex, e.shiftKey, e.ctrlKey)}
-                  id={`cell_${cell.id}`} key={cIndex} className={twMerge("border border-gray-300 w-10 h-6 flex items-center", selectedCells.includes(`${rIndex}-${cIndex}` || '') && "border-2 border-green-700", formulaCell.cell && selectedCells.includes(`${rIndex}-${cIndex}` || '') && "border-2 border-dashed")} >
-                  <input
-                    type="text"
-                    className={twMerge("w-full h-full px-2 outline-none border-none text-center text-xs")}
-                    style={data.styles}
-                    value={data.value}
-                    onChange={(e) => onChangeCell(`${rIndex}-${cIndex}`,e.target.value)}
-                  />
-                </div>
-              )
-            })
-          )}
+
+        <div className="flex">
+          {/* left header */}
+          <div style={{ display: "grid", gridTemplateRows: `repeat(${rows+1},1fr)`,height:'100%' }}>
+            {Array.from({ length: rows + 1 }).map((_, cIndex) => {
+              if (cIndex == 0) return <div className="border w-10 h-6 flex items-center justify-center" key={`row_${cIndex}`}></div>
+              else return <div className={twMerge("border w-10 h-6 flex items-center justify-center", selectedCells.find(cell => cell.split('-')[0] == (cIndex - 1).toString()) && "border-2 bg-green-700 text-white")} key={`row_${cIndex}`}>{cIndex}</div>
+            })}
+          </div>
+          <div className="flex flex-col">
+            {/* top header */}
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols},1fr)` ,width:'100%' }}>
+              {grid.map((col, cIndex) => {
+                return <div className={twMerge("border w-10 h-6 flex items-center justify-center", selectedCells.find(cell => cell.split('-')[1] == cIndex.toString()) && "border-2 bg-green-700 text-white")} key={`col_${cIndex}`}>{String.fromCharCode(65 + cIndex)}</div>
+              })}
+            </div>
+            <div
+              className="border-2 border-gray-300 grid"
+              style={{
+                display: "grid",
+                gridTemplateColumns: `repeat(${cols},1fr)`,
+                gridTemplateRows: `repeat(${rows},1fr)`,
+              }}>
+              {grid.map((row, rIndex) =>
+                row.map((cell, cIndex) => {
+                  const data = formulaCell.cell && formulaCell.cell.id == cell.id ? { ...formulaCell.cell } : { ...cell }
+                  return (
+                    <div
+                      onClick={(e) => selectCell(cell, rIndex, cIndex, e.shiftKey, e.ctrlKey)}
+                      id={`cell_${cell.id}`} key={cIndex} className={twMerge("border border-gray-300 w-10 h-6 flex items-center", selectedCells.includes(`${rIndex}-${cIndex}` || '') && "border-2 border-green-700", formulaCell.cell && selectedCells.includes(`${rIndex}-${cIndex}` || '') && "border-2 border-dashed")} >
+                      <input
+                        type="text"
+                        className={twMerge("w-full h-full px-2 outline-none border-none text-center text-xs")}
+                        style={data.styles}
+                        value={data.value}
+                        onChange={(e) => onChangeCell(`${rIndex}-${cIndex}`, e.target.value)}
+                      />
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          </div>
+
         </div>
+
       </div>
     </div>
   );
