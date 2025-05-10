@@ -53,6 +53,8 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
 
 
     const [selectedCells, setSelectedCells] = useState<string[]>([])
+    const [anchorCell, setAnchorCell] = useState<string | null>(null)
+    const [lastCell, setLastCell] = useState<string | null>(null)
 
     const [formulaDependencies, setFormulaDependencies] = useState<Map<string, string[]>>(new Map())
 
@@ -92,7 +94,7 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
 
     //this function is used to update the formula cell when the value of a cell changes
     const updateFormulaOnValueChange = (cellId: string, newCellValue: string) => {
-      const usedFormulaCells: {cell: Cell, dependencies: string[]}[] = []
+        const usedFormulaCells: { cell: Cell, dependencies: string[] }[] = []
 
         //find the related formula cell 
         formulaDependencies.forEach((deps, targetCell: string) => {
@@ -101,7 +103,7 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
                 if (row >= 0 && row < grid.length && col >= 0 && col < grid[row].length) {
                     const formulaCell = grid[row][col] as Cell;
                     if (formulaCell.formula) {
-                        usedFormulaCells.push({cell: formulaCell, dependencies: deps});
+                        usedFormulaCells.push({ cell: formulaCell, dependencies: deps });
                     }
                 }
             }
@@ -109,7 +111,7 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
 
 
         //update the formula cells accordin to new calculations
-        usedFormulaCells.forEach(({cell, dependencies}) => {
+        usedFormulaCells.forEach(({ cell, dependencies }) => {
             const formulaType = cell.formula;
             if (!formulaType) return;
 
@@ -362,18 +364,23 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
     const onClickSum = () => {
         if (!selectedCells.length) return;
 
+
+        //set the formula cell to sum
+        const [row, col] = getCellPosition(selectedCells[0])
+        const actualFormulaCell = grid[row][col]
+        setFormulaCell({ type: 'SUM', cell: { id: actualFormulaCell.id, row: row, col: col, styles: { fontWeight: 'normal', backgroundColor: 'lightgray' }, value: '=SUM()', formula: 'SUM' } })
+
         //now we will select first cell which contains data, to show users that cell can be selected
         grid.forEach((row, rIndex) => {
             row.forEach((cell, cIndex) => {
-                if (cell.value != '') {
-                    setSelectedCells([`${rIndex}-${cIndex}` || ''])
+                if (cell.value != '' && !cell.formula) {
+                    selectCell(rIndex, cIndex, false)
                     return;
                 }
             })
         })
-        const [row, col] = getCellPosition(selectedCells[0])
-        const actualCell = grid[row][col]
-        setFormulaCell({ type: 'SUM', cell: { id: actualCell.id, row: row, col: col, styles: { fontWeight: 'normal', backgroundColor: 'lightgray' }, value: '=SUM()', formula: 'SUM' } })
+        setSelectedRange(null)
+
     }
 
     //this function is used to select a cell and set the formula cell to average
@@ -384,7 +391,7 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
         grid.forEach((row, rIndex) => {
             row.forEach((cell, cIndex) => {
                 if (cell.value != '') {
-                    setSelectedCells([`${rIndex}-${cIndex}` || ''])
+                    selectCell(rIndex, cIndex, false)
                     return;
                 }
             })
@@ -394,6 +401,35 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
         setFormulaCell({ type: 'AVG', cell: { id: actualCell.id, row: row, col: col, styles: { fontWeight: 'normal', backgroundColor: 'lightgray' }, value: '=AVG()', formula: 'AVG' } })
     }
 
+
+
+
+    //this function is used to select a cell or a range of cells
+    const selectCell = (row: number, col: number, shiftPressed: boolean) => {
+        if (shiftPressed && selectedCells.length>0) { //if shift is pressed and there are already selected cells, then we will select a range
+
+            //get the anchor cell
+            const start = getCellPosition(anchorCell || '');
+
+            //current cell will be last cell of range
+            const end: [number, number] = [row, col];
+    
+            const selectedRange = { start, end };
+            
+            //get the selected cell ids from range
+            const selectedCellIds = getSelectedCellsFromRange(selectedRange);
+
+            //set the selected cells and range
+            if (selectedCellIds) setSelectedCells(selectedCellIds);
+            setSelectedRange(selectedRange);
+            
+        } else { //if shift is not pressed, then we will select a single cell
+            setSelectedRange(null)
+            setSelectedCells([`${row}-${col}`])
+            setAnchorCell(`${row}-${col}`)
+        }
+        setLastCell(`${row}-${col}`)
+    }
 
 
     //this function is used to handle if any keyboard key is pressed
@@ -435,31 +471,37 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
             setFormulaCell({ type: null, cell: null })
 
         }
-    }
 
-    //this function is used to select a cell or a range of cells
-    const selectCell = (row: number, col: number, shiftPressed: boolean) => {
-        if (shiftPressed && selectedCells.length>0) { //if shift is pressed and there are already selected cells, then we will select a range
+        //handle cell navigation on arrow keys
+        if (e.shiftKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
 
-            const start = getCellPosition(selectedCells[0])
+            const anchor = getCellPosition(anchorCell || ''); // this is the first cell or range
+            const last = getCellPosition(lastCell || ''); // this is the last cell of range
+        
+            if (!anchor || !last) return;
+        
+            let [newRow, newCol] = last;
+        
+            if (e.key === 'ArrowUp' && newRow > 0) newRow--;
+            if (e.key === 'ArrowDown' && newRow < rows - 1) newRow++;
+            if (e.key === 'ArrowLeft' && newCol > 0) newCol--;
+            if (e.key === 'ArrowRight' && newCol < cols - 1) newCol++;
+            selectCell(newRow, newCol, true)
+        } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            // Regular navigation without shift key
+            const [row, col] = getCellPosition(selectedCells[0]);
 
-            const rangeStart: [number, number] = start || [row, col]
-            const rangeEnd: [number, number] = [row, col]
-            const selectedRange = { start: rangeStart, end: rangeEnd }
-
-            setSelectedRange(selectedRange)
-
-            //if range is changed , then set selected cells according to it
-            const selected = getSelectedCellsFromRange(selectedRange)
-
-            if (selected) setSelectedCells(selected)
-        } else { //if shift is not pressed, then we will select a single cell
-            setSelectedRange(null)
-            setSelectedCells([`${row}-${col}`])
+            if (e.key === 'ArrowUp' && row > 0) {
+                selectCell(row - 1, col, false);
+            } else if (e.key === 'ArrowDown' && row < rows - 1) {
+                selectCell(row + 1, col, false);
+            } else if (e.key === 'ArrowLeft' && col > 0) {
+                selectCell(row, col - 1, false);
+            } else if (e.key === 'ArrowRight' && col < cols - 1) {
+                selectCell(row, col + 1, false);
+            }
         }
     }
-
-
 
     useEffect(() => {
         const handlePasteWrapper = (e: ClipboardEvent) => handlePaste(e);
