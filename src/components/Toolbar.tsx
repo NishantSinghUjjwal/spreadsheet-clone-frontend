@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { HexColorPicker } from 'react-colorful'
+import { twMerge } from 'tailwind-merge'
+import { Cell } from '../App'
 
 const Toolbar = ({
     changeFontWeight,
@@ -7,7 +9,9 @@ const Toolbar = ({
     onClickSum,
     onClickAvg,
     exportToJSON,
-    importFromJSON
+    importFromJSON,
+    selectedCells,
+    grid
 }: {
     changeFontWeight: () => void
     changeCellBackground: (color: string) => void
@@ -15,15 +19,23 @@ const Toolbar = ({
     onClickAvg: () => void
     exportToJSON: () => void
     importFromJSON: (e: React.ChangeEvent<HTMLInputElement>) => void
+    selectedCells: string[],
+    grid: Cell[][]
 }) => {
     const [showFillColorPicker, setShowFillColorPicker] = useState(false)
+
+    const isAnyCellBold = selectedCells.some(cell =>{
+        const [row, col] = cell.split('-').map(Number)
+        const actualCell = grid[row][col]
+        return actualCell.styles.fontWeight === 'bold'
+    })
     return (<div className="flex gap-2 bg-gray-100 p-2 border-b border-gray-300 items-center">
         <div className="flex gap-2">
-            <button className="p-1 px-2 bg-white border border-gray-300 rounded hover:bg-gray-200 font-bold" onClick={changeFontWeight}>B</button>
+            <button className={twMerge("p-1 px-2 bg-white border border-gray-300 rounded hover:bg-gray-200 font-bold",isAnyCellBold && "bg-gray-200")} onClick={changeFontWeight}>B</button>
             <div className="relative">
                 <button className="p-1 px-2 bg-white border border-gray-300 rounded hover:bg-gray-200 flex items-center" onClick={() => setShowFillColorPicker(prev => !prev)}>
                     <span className="mr-1">A</span>
-                    <div className="w-3 h-3 border border-gray-400 bg-black"></div>
+                    <div className="w-3 h-3 border border-gray-400 bg-red-500"></div>
                 </button>
                 {showFillColorPicker && (
                     <div className="absolute z-10 mt-1 shadow-xl">

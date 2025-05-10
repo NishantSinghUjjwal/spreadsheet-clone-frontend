@@ -61,17 +61,26 @@ function App() {
 
   //i used fill before, but it was causing issues, thats why has to use .from()
   const [grid, setGrid] = useState<Cell[][]>(
-    Array.from({ length: DEFAULT_CELL_COUNT }, () =>
-      Array.from({ length: DEFAULT_CELL_COUNT }, () => ({
-        ...INITIAL_CELL,
-        id: uuid(),
-      }))
+    Array.from({ length: DEFAULT_CELL_COUNT }, (_, rIndex) =>
+      Array.from({ length: DEFAULT_CELL_COUNT }, (_, cIndex) =>{
+          return {
+            ...INITIAL_CELL,
+            id: uuid(),
+            row: rIndex,
+            col: cIndex
+          }
+      })
     )
   );
 
+  useEffect(() => {
+    console.log(grid.length,grid[0].length)
+    if(grid.length == 0 || grid[0].length == 0) return;
+    setSelectedCells([`${0}-${0}` || ''])
+  }, [grid.length,grid[0].length])
+
 
   const changeCellBackground = (color: string) => {
-    console.log('color', color)
     setGrid(prev => prev.map((row, rIndex) => row.map((cell, cIndex) => {
       if (selectedCells.includes(`${rIndex}-${cIndex}` || '')) return {
         ...cell,
@@ -85,7 +94,6 @@ function App() {
   }
 
   function updateFormula(cellId: string, newCellValue: string) {
-    console.log('cellId', cellId)
     let usedFormulaCell: Cell | null = null;
     let dependencies: string[] = [];
 
@@ -102,7 +110,6 @@ function App() {
       }
     });
 
-    console.log('usedFormulaCell', usedFormulaCell)
     //@ts-ignore
     if (!usedFormulaCell || !usedFormulaCell.formula) return;
     // Add type assertion to help TypeScript understand the type
@@ -166,23 +173,10 @@ function App() {
     })))
   }
 
-
-  const createIdPositionMap = (grid: Cell[][]): Map<string, [number, number]> => {
-    const map = new Map();
-    for (let row = 0; row < grid.length; row++) {
-      for (let col = 0; col < grid[row].length; col++) {
-        const cell = grid[row][col];
-        if (cell.id) map.set(cell.id, [row, col]);
-      }
-    }
-    return map;
-  }
   const handleCopy = (e: ClipboardEvent) => {
     if (!selectedCells.length) return;
 
     e.preventDefault(); // Prevent default copy behavior
-
-    const idMap = createIdPositionMap(grid); // Maps cell.id => [row, col]
 
     const copiedData: {
       rowOffset: number;
@@ -195,12 +189,13 @@ function App() {
     }[] = [];
 
     const anchorId = selectedCells[0];
-    const [anchorRow, anchorCol] = idMap.get(anchorId) ?? [];
+
+    const [anchorRow, anchorCol] = anchorId.split('-').map(Number)
 
     if (anchorRow === undefined || anchorCol === undefined) return;
 
     for (const id of selectedCells) {
-      const [row, col] = idMap.get(id) ?? [];
+      const [row, col] = id.split('-').map(Number)
       if (row === undefined || col === undefined) continue;
 
       const cell = grid[row][col];
@@ -243,7 +238,6 @@ function App() {
 
     if (!copiedCells?.length) return;
 
-    const idMap = createIdPositionMap(grid);
     const newGrid = [...grid.map(row => [...row])];
 
     if (copiedCells.length === 1) {
@@ -251,7 +245,7 @@ function App() {
       const copied = copiedCells[0];
 
       for (const id of selectedCells) {
-        const [row, col] = idMap.get(id) ?? [];
+        const [row, col] = id.split('-').map(Number)
 
         if (row === undefined || col === undefined) continue;
 
@@ -262,7 +256,7 @@ function App() {
       }
     } else {
       // Multi-cell paste using relative position from anchor
-      const [startRow, startCol] = idMap.get(selectedCells[0]) ?? [0, 0];
+      const [startRow, startCol] = selectedCells[0].split('-').map(Number)
 
       for (const cellData of copiedCells) {
         const targetRow = startRow + cellData.rowOffset;
@@ -370,15 +364,17 @@ function App() {
     if (!selectedCells.length) return;
 
     //now we will select first cell which contains data, to show users that cell can be selected
-    grid.forEach(row => {
-      row.forEach(cell => {
+    grid.forEach((row, rIndex) => {
+      row.forEach((cell, cIndex) => {
         if (cell.value != '') {
-          setSelectedCells([`${cell.row}-${cell.col}` || ''])
+          setSelectedCells([`${rIndex}-${cIndex}` || ''])
           return;
         }
       })
     })
-    setFormulaCell({ type: 'AVG', cell: { id: selectedCells[0], styles: { fontWeight: 'normal', backgroundColor: 'lightgray' }, value: '=AVG()', formula: 'AVG' } })
+    const [row, col] = selectedCells[0].split('-').map(Number)
+    const actualCell = grid[row][col]
+    setFormulaCell({ type: 'AVG', cell: { id: actualCell.id, row: row, col: col, styles: { fontWeight: 'normal', backgroundColor: 'lightgray' }, value: '=AVG()', formula: 'AVG' } })
   }
 
   const calculateFormula = (type: string | null, values: number[]) => {
@@ -534,6 +530,8 @@ function App() {
         onClickAvg={onClickAvg}
         exportToJSON={exportToJSON}
         importFromJSON={importFromJSON}
+        selectedCells={selectedCells}
+        grid={grid}
         />
         </div>
 

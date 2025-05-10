@@ -16,7 +16,6 @@ const GridHeaderLayout = (
 ) => {
  
     const getColumnHeader = (col: number) => {
-        console.log(col)
 
         //if alphabets end, we will use AA,BB
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
