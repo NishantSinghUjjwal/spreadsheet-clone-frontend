@@ -57,3 +57,15 @@ export const getSelectedCellsFromRange = (selectedRange: { start: [number, numbe
   }
 
   
+  export const getColumnHeaderAlphabets = (col: number) => {
+
+    //if alphabets end, we will use AA,BB
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    const result = []
+    while (col > 0) {
+      col--; //use 0 index logic
+      result.push(letters[col % 26])
+      col = Math.floor(col / 26)
+    }
+    return result.reverse().join('')
+  }

@@ -379,18 +379,21 @@ const GridProvider = ({children}: {children: React.ReactNode}) => {
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key == 'Enter') {
+      //if formula cell is not selected, then return
       if (!formulaCell.cell) return
       const selectedCells = getSelectedCellsFromRange(selectedRange)
       if (!selectedCells) return
 
+      //get the values of the selected cells
       const values = selectedCells.map(cell => {
         const [row, col] = getCellPosition(cell)
         return Number(grid[row][col].value)
       })
-      const total = calculateFormula(formulaCell.type || null, values)
-      if (isNaN(Number(total)) || total == undefined) return;
-      if(formulaCell.type == null) return;
 
+      //calculate the formula
+      const total = calculateFormula(formulaCell.type || null, values)
+
+      //update the formula cell with results
       setGrid(prev => prev.map(row => row.map(cell => {
         if (cell.id == formulaCell.cell?.id) {
           return { ...cell, value: total.toString(), formula: formulaCell.type }
@@ -398,46 +401,52 @@ const GridProvider = ({children}: {children: React.ReactNode}) => {
         return cell
       })))
 
+      //link cells used for formula calculation with the formal cell
       setFormulaDependencies(prev => {
         const newDependencies = new Map(prev);
         newDependencies.set(`${formulaCell.cell?.row}-${formulaCell.cell?.col}` || '', selectedCells);
         return newDependencies;
       });
 
+      //finally show formula cell as selected cell
       setSelectedCells([`${formulaCell.cell?.row}-${formulaCell.cell?.col}` || ''])
+
+      //reset formula cell
       setFormulaCell({ type: null, cell: null })
 
     }
   }
 
   const selectCell = (row: number, col: number, shiftPressed: boolean) => {
-
-  
     if (shiftPressed) {
-      //if shift is preseed we need to save range of ids inside array
-      setSelectedRange(prev => {
-        if (prev == null) {
-          let start = null
-          grid.forEach((r, rIndex) => {
-            r.forEach((c, cIndex) => {
-              if (`${rIndex}-${cIndex}` == selectedCells[0]) {
-                start = [rIndex, cIndex]
-              }
-            })
+      let start: [number, number] | null = null
+  
+      if (selectedCells.length === 1) {
+        grid.forEach((r, rIndex) => {
+          r.forEach((c, cIndex) => {
+            if (`${rIndex}-${cIndex}` === selectedCells[0]) {
+              start = [rIndex, cIndex]
+            }
           })
-          return { start: start || [row, col], end: [row, col] }
-        }
-        else {
-          return { start: prev.start, end: [row, col] }
-        }
-      })
-    }
-    else {
-        //if single cell is selected
+        })
+      }
+  
+      const rangeStart: [number, number] = start || [row, col]
+      const rangeEnd: [number, number] = [row, col]
+      const selectedRange = { start: rangeStart, end: rangeEnd }
+  
+      setSelectedRange(selectedRange)
+
+      //if range is changed , then set selected cells according to it
+      const selected = getSelectedCellsFromRange(selectedRange)
+
+      if (selected) setSelectedCells(selected)
+    } else {
       setSelectedRange(null)
-      setSelectedCells([`${row}-${col}` || ''])
+      setSelectedCells([`${row}-${col}`])
     }
   }
+  
 
 
   useEffect(() => {
@@ -453,17 +462,10 @@ const GridProvider = ({children}: {children: React.ReactNode}) => {
       document.removeEventListener('copy', handleCopyWrapper);
       document.removeEventListener('keydown', handleKeyDown)
     };
-  }, [grid, selectedCells]); 
+  }, [grid, selectedCells, selectedRange]); 
 
 
-  
-  useEffect(() => {
-    if (!selectedRange?.start || !selectedRange?.end) return
-    const selectedCells = getSelectedCellsFromRange(selectedRange)
-    if (!selectedCells) return
-    setSelectedCells([...selectedCells])
 
-  }, [selectedRange?.start, selectedRange?.end])
 
 
   useEffect(() => {
@@ -471,7 +473,6 @@ const GridProvider = ({children}: {children: React.ReactNode}) => {
     if(grid.length == 0 || grid[0].length == 0) return;
 
     //select first cell by default
-
     setSelectedCells(['0-0'])
   }, [grid.length,grid[0].length])
 
