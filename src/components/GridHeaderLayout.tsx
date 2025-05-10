@@ -1,20 +1,15 @@
 import React from 'react'
 import { twMerge } from 'tailwind-merge'
-
+import useGridContext from '../hooks/useGridContext'
 const GridHeaderLayout = (
     {
-        rows,
-        cols,
-        selectedCells,
         children
     }: {
-        rows: number,
-        cols: number,
-        selectedCells: string[],
         children: React.ReactNode
     }
 ) => {
  
+    const {rows, cols, selectedCells} = useGridContext()
     const getColumnHeader = (col: number) => {
 
         //if alphabets end, we will use AA,BB

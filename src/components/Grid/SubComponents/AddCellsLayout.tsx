@@ -1,6 +1,7 @@
 import React from 'react'
-
-const AddCellsLayout = ({ children, addRow, addCol }: { children: React.ReactNode, addRow: () => void, addCol: () => void }) => {
+import useGridContext from '../../../hooks/useGridContext'
+const AddCellsLayout = ({ children,  }: { children: React.ReactNode, }) => {
+    const {addRow, addCol} = useGridContext()
     return (
         <div className="flex h-[calc(100%_-_7.50rem)] relative">
             <div className="flex flex-col w-[calc(100%_-_1.5rem)] h-full">

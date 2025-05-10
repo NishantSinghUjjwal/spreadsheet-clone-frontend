@@ -1,6 +1,7 @@
 import React from 'react'
-
-const Footer = ({ selectedCells }: { selectedCells: string[] }) => {
+import useGridContext from '../hooks/useGridContext'
+const Footer = () => {
+  const {selectedCells} = useGridContext()
   return (
     <div className="bg-gray-100 p-1 text-xs text-gray-600 border-t border-gray-300 flex">
     <div className="px-2">

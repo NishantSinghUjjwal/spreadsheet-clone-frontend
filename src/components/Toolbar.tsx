@@ -1,28 +1,12 @@
 import React, { useState } from 'react'
 import { HexColorPicker } from 'react-colorful'
 import { twMerge } from 'tailwind-merge'
-import { Cell } from '../App'
+import { Cell } from '../types/types'
 import ColorPicker from './ui/ColorPicker'
+import useGridContext from '../hooks/useGridContext'
 
-const Toolbar = ({
-    changeFontWeight,
-    changeCellBackground,
-    onClickSum,
-    onClickAvg,
-    exportToJSON,
-    importFromJSON,
-    selectedCells,
-    grid
-}: {
-    changeFontWeight: () => void
-    changeCellBackground: (color: string) => void
-    onClickSum: () => void
-    onClickAvg: () => void
-    exportToJSON: () => void
-    importFromJSON: (e: React.ChangeEvent<HTMLInputElement>) => void
-    selectedCells: string[],
-    grid: Cell[][]
-}) => {
+const Toolbar = () => {
+    const {selectedCells, grid, changeCellBackground, changeFontWeight, onClickSum, onClickAvg, exportToJSON, importFromJSON} = useGridContext()
     const [showFillColorPicker, setShowFillColorPicker] = useState(false)
 
     const isAnyCellBold = selectedCells.some(cell =>{
