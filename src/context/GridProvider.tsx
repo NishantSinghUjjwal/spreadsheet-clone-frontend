@@ -131,7 +131,13 @@ const GridProvider = ({children}: {children: React.ReactNode}) => {
   //i need to implement debouncing here later :TODO
   const onChangeCellValue = (id: string, value: string) => {
     setGrid(prev => prev.map((r, i) => r.map((c, j) => {
-      if (`${i}-${j}` == id) return { ...c, value }
+        const newCell = { ...c, value }
+
+        //if the cell is a formula, then remove the formula,because we are manually changing it
+        if(newCell.formula) {
+          newCell.formula = null
+        }
+      if (`${i}-${j}` == id) return newCell
       else return c
     })))
 
