@@ -1,3 +1,4 @@
+export type FormulaType = 'SUM' | 'AVG'
 
 export interface Cell {
     id: null | string,
@@ -7,7 +8,7 @@ export interface Cell {
     styles: {
       fontWeight: string;
       backgroundColor: string;
-    };
-    formula?: 'SUM' | 'AVG' | null
+    };  
+    formula: FormulaType|null
   }
   

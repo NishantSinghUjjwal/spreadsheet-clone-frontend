@@ -4,7 +4,9 @@ import { Cell } from '../../types/types';
 import { v4 as uuid } from 'uuid'
 import useGridContext from '../../hooks/useGridContext'
 const Grid = () => {
-    const {cols, rows, grid, formulaCell, selectedCells, selectCell, onChangeCell} = useGridContext()
+
+    const {cols, rows, grid, formulaCell, selectedCells, selectCell, onChangeCellValue} = useGridContext()
+
     return (
     <div
     style={{
@@ -20,7 +22,7 @@ const Grid = () => {
 
         return (
           <div
-            onClick={(e) => selectCell(cell, rIndex, cIndex, e.shiftKey, e.ctrlKey)}
+            onClick={(e) => selectCell(rIndex, cIndex, e.shiftKey)}
             id={`cell_${cell.id}`}
             key={cIndex}
             className={twMerge(
@@ -34,7 +36,7 @@ const Grid = () => {
               className={twMerge("w-full h-full px-1 outline-none border-none text-center text-xs bg-transparent")}
               style={data.styles}
               value={data.value}
-              onChange={(e) => onChangeCell(`${rIndex}-${cIndex}`, e.target.value)}
+              onChange={(e) => onChangeCellValue(`${rIndex}-${cIndex}`, e.target.value)}
             />
           </div>
         )
