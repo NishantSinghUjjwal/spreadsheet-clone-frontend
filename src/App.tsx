@@ -550,7 +550,7 @@ function App() {
           <div className="flex flex-col">
             {/* top header */}
             <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols},1fr)` ,width:'100%' }}>
-              {grid.map((col, cIndex) => {
+              {Array.from({ length: cols }).map((_, cIndex) => {
                 return <div className={twMerge("border w-10 h-6 flex items-center justify-center", selectedCells.find(cell => cell.split('-')[1] == cIndex.toString()) && "border-2 bg-green-700 text-white")} key={`col_${cIndex}`}>{String.fromCharCode(65 + cIndex)}</div>
               })}
             </div>
