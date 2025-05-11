@@ -60,7 +60,7 @@ The built files will be in the `build` directory.
 
 ### Basic Navigation
 - Click on a cell to select it
-- Use Shift + mouse click to select multiple cells
+- Use Shift + (mouse click/arrow keys) to select multiple cells
 
 ### Formatting Cells
 - Select a cell or multiple cells
@@ -75,8 +75,8 @@ The built files will be in the `build` directory.
 4. The result will be displayed in the initially selected cell
 
 ### Adding Rows and Columns
-- Click the "Add Row" button to add a new row at the bottom
-- Click the "Add Column" button to add a new column on the right
+- Click the "+" button to add a new row at the bottom
+- Click the "+" button to add a new column on the right
 
 ### Export/Import
 - Click "Export" to save your spreadsheet as a JSON file
@@ -87,7 +87,6 @@ The built files will be in the `build` directory.
 - React 19
 - TypeScript
 - TailwindCSS
-- UUID
 - React Colorful (for color picker)
 - Lucide React (for icons)
 
