@@ -1,15 +1,16 @@
 import React, { createContext, useCallback, useEffect, useState } from 'react'
 import { Cell, FormulaType } from '../types/types';
 import { calculateFormula, getCellPosition, getSelectedCellsFromRange } from '../utils/reusableFunctions'
+import { FORMULA_TYPES } from '../utils/constants';
 interface GridContextType {
     rows: number,
     cols: number,
     grid: Cell[][],
     selectedCells: string[],
-    selectedFormulaCell: { id: string, type: 'SUM' | 'AVG' | null } | null,
+    selectedFormulaCell: { id: string, type: FormulaType | null } | null,
     selectedRange: { start: [number, number], end: [number, number] } | null,
     setSelectedCells: (cells: string[]) => void,
-    setSelectedFormulaCell: (cell: { id: string, type: 'SUM' | 'AVG' | null } | null) => void,
+    setSelectedFormulaCell: (cell: { id: string, type: FormulaType | null } | null) => void,
     setSelectedRange: (range: { start: [number, number], end: [number, number] } | null) => void,
     setGrid: (grid: Cell[][]) => void,
     setRows: (rows: number) => void,
@@ -29,6 +30,7 @@ interface GridContextType {
     selectCell: (row: number, col: number, shiftPressed: boolean) => void,
     onChangeCellValue: (row: number, col: number, value: string) => void,
 }
+
 export const GridContext = createContext<GridContextType>({} as GridContextType)
 
 //default grid rows and cols
@@ -40,8 +42,9 @@ const INITIAL_CELL: Cell = {
     styles: { fontWeight: "normal", backgroundColor: "transparent" },
     formula: null
 };
+
 const GridProvider = ({ children }: { children: React.ReactNode }) => {
-    
+
 
 
     const [rows, setRows] = useState(DEFAULT_CELL_COUNT);
@@ -58,7 +61,6 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
 
     // This is the formula dependencies (maintains the linkage of formula and cells used for the formula)
     const [formulaDependencies, setFormulaDependencies] = useState<Map<string, string[]>>(new Map())
-
 
     const [selectedFormulaCell, setSelectedFormulaCell] = useState<{ id: string, type: FormulaType | null } | null>(null)
 
@@ -110,7 +112,7 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
         });
 
         //update the formula cells accordin to new calculations
-        usedFormulaCells.forEach(({ id:formulaCellId, cell, dependencies }) => {
+        usedFormulaCells.forEach(({ id: formulaCellId, cell, dependencies }) => {
             const formulaType = cell.formula;
             if (!formulaType) return;
 
@@ -137,9 +139,9 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
 
     const onChangeCellValue = useCallback((row: number, col: number, value: string) => {
         setGrid(prev => prev.map((r, i) => r.map((c, j) => {
-            
-            
-            
+
+
+
             if (`${i}-${j}` == `${row}-${col}`) {
                 const newCell = { ...c, value }
                 //if the cell is a formula, then remove the formula,because we are manually changing it
@@ -258,7 +260,7 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
 
         //set the formula cell to sum
         const [row, col] = getCellPosition(selectedCells[0])
-        setSelectedFormulaCell({ id: `${row}-${col}`, type: 'SUM' })
+        setSelectedFormulaCell({ id: `${row}-${col}`, type: FORMULA_TYPES.SUM })
 
         //now we will select first cell which contains data, to show users that cell can be selected
         grid.forEach((row, rIndex) => {
@@ -288,7 +290,7 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
         })
         const [row, col] = getCellPosition(selectedCells[0])
         const actualCell = grid[row][col]
-        setSelectedFormulaCell({ id: `${row}-${col}`, type: 'AVG' })
+        setSelectedFormulaCell({ id: `${row}-${col}`, type: FORMULA_TYPES.AVG })
     }, [grid, selectedCells])
 
 
@@ -296,7 +298,7 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
 
     const selectCell = useCallback((row: number, col: number, shiftPressed: boolean) => {
         //if shift is pressed and there are already selected cells, then we will select a range
-        if (shiftPressed && selectedCells.length > 0) { 
+        if (shiftPressed && selectedCells.length > 0) {
 
             //get the anchor cell
             const start = getCellPosition(anchorCell || '');
@@ -554,7 +556,7 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
             onClickSum,
             onClickAvg,
             exportToJSON,
-            importFromJSON: (e: React.ChangeEvent<HTMLInputElement>) => importFromJSON(e),
+            importFromJSON,
             handleCopy,
             handlePaste,
             handleKeyDown,

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { twMerge } from 'tailwind-merge'
-import useGridContext from '../../hooks/useGridContext'
+import useGridContext from '../hooks/useGridContext'
 const Grid = () => {
 
     const {cols, rows, grid, selectedFormulaCell, selectedCells, selectCell, onChangeCellValue} = useGridContext()

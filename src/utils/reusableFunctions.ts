@@ -1,4 +1,5 @@
 import { FormulaType } from "../types/types";
+import { FORMULA_TYPES } from "./constants";
 
 
 export const getCellPosition = (cellId: string): [number, number] => {
@@ -31,10 +32,10 @@ export const getSelectedCellsFromRange = (
 
 
 export const calculateFormula = (type: FormulaType | null, values: number[]) => {
-  if (type == 'SUM') {
+  if (type == FORMULA_TYPES.SUM) {
     return calculateSum(values)
   }
-  else if (type == 'AVG') {
+  else if (type == FORMULA_TYPES.AVG) {
     return calculateAvg(values)
   }
   else throw new Error('Invalid formula type')

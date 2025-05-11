@@ -1,17 +1,12 @@
-import React, { useState } from 'react'
-import { HexColorPicker } from 'react-colorful'
+import { useState } from 'react'
 import { twMerge } from 'tailwind-merge'
-import { Cell } from '../types/types'
-import ColorPicker from './ui/ColorPicker'
+import ColorPicker from './ColorPicker'
 import useGridContext from '../hooks/useGridContext'
 import { 
   Bold, 
   PaintBucket, 
-  Plus, 
-  FileJson, 
   Upload,
   Calculator, 
-  PanelLeftClose,
   Download
 } from 'lucide-react'
 

@@ -1,17 +1,10 @@
 import "./App.css";
 import Toolbar from "./components/Toolbar";
-import AddCellsLayout from "./components/Grid/SubComponents/AddCellsLayout";
+import AddCellsLayout from "./components/AddCellsLayout";
 import Footer from "./components/Footer";
 import GridHeaderLayout from "./components/GridHeaderLayout";
-import Grid from "./components/Grid/Grid";
 import {useEffect} from 'react'
-//10 x 10 default grid (DONE)
-//can add more rows and columns (DONE)
-//can perform SUM and AVG functions on selected cells (DONE)
-//can format selected cells with bold text and background color (DONE)
-//can copy paste cells (DONE)
-//can save the  spreadsheet to JSON format (DONE)
-//can load the spreadsheet from JSON format (DONE)
+import Grid from "./components/Grid";
 
 const App = () => {
 
