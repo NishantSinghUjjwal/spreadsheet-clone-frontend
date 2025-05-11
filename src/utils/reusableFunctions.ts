@@ -14,6 +14,7 @@ export const getSelectedCellsFromRange = (
     const [startRow, startCol] = selectedRange.start;
     const [endRow, endCol] = selectedRange.end;
 
+    //find boundary rows and columns
     const top = Math.min(startRow, endRow);
     const bottom = Math.max(startRow, endRow);
     const left = Math.min(startCol, endCol);

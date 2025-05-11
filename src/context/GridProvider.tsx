@@ -327,7 +327,7 @@ const GridProvider = ({ children }: { children: React.ReactNode }) => {
     const handleCopy = useCallback((e: ClipboardEvent) => {
         if (!selectedCells.length) return;
 
-        e.preventDefault(); // Prevent default copy behavior
+        e.preventDefault();
 
         const copiedData: {
             rowOffset: number;
