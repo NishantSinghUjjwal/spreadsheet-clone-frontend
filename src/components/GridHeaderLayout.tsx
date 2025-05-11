@@ -1,7 +1,7 @@
 import React from 'react'
 import { twMerge } from 'tailwind-merge'
 import useGridContext from '../hooks/useGridContext'
-import { getColumnHeaderAlphabets } from '../utils'
+import { getColumnHeaderAlphabets } from '../utils/reusableFunctions'
 const GridHeaderLayout = (
     {
         children

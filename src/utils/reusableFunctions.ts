@@ -1,5 +1,6 @@
 import { FormulaType } from "../types/types";
 
+
 export const getCellPosition = (cellId: string): [number, number] => {
   return cellId.split('-').map(Number) as [number, number]
 }
